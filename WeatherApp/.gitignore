@@ -1,0 +1,17 @@
+# Xcode
+build/
+DerivedData/
+
+# User-specific Xcode settings
+*.xcuserdatad
+xcuserdata/
+
+# Sensitive data
+secret-config.plist
+
+# Xcode project file
+WeatherApp.xcodeproj/
+
+# Logs and temporary files
+*.log
+*.tmp
