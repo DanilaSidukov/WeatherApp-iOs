@@ -1,7 +1,7 @@
 # Xcode
 build/
 DerivedData/
-*.DS_Store
+.DS_Store
 
 # User-specific Xcode settings
 *.xcuserdatad
