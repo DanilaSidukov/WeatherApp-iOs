@@ -2,6 +2,7 @@
 enum NetworkError: Error {
     
     case invalidURL
-    case invalidRe
+    case invalidResponse
+    case invalidData
 }
 

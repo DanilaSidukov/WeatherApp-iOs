@@ -1,7 +1,7 @@
-//
-//  Untitled.swift
-//  WeatherApp
-//
-//  Created by Danila Sidukov on 13.03.2025.
-//
 
+struct LocationData {
+    let location: String?
+    let temperature: String?
+    let temperatureRange: String?
+    let weatherIcon: String?
+}

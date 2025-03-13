@@ -10,10 +10,10 @@ import Foundation
 import CoreData
 
 
-extension Entity {
+extension Location {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Entity> {
-        return NSFetchRequest<Entity>(entityName: "Location")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<Location> {
+        return NSFetchRequest<Location>(entityName: "Location")
     }
 
     @NSManaged public var isSelected: Bool
@@ -24,6 +24,6 @@ extension Entity {
 
 }
 
-extension Entity : Identifiable {
+extension Location : Identifiable {
 
 }

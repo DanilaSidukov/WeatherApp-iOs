@@ -2,8 +2,8 @@ import UIKit
 
 struct LocationItemView: Hashable {
     let location: String
-    let isSelected: Bool
-    let temperature: Int
-    let temperatureRange: [Int?]
+    var isSelected: Bool
+    let temperature: String
+    let temperatureRange: String
     let weatherIcon: UIImage
 }

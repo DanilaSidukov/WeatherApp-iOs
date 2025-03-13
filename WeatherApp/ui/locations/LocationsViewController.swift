@@ -2,18 +2,13 @@ import UIKit
 import SwiftUI
 import Foundation
 
-class LocationsViewController: UIViewController {
+final class LocationsViewController: UIViewController {
     
-    let items: [LocationItemView] = [
-        LocationItemView(location: "Ухоу", isSelected: true, temperature: 12, temperatureRange: [6, 16], weatherIcon: UIImage(named: "ic_cloud_black_with_sun")!),
-        LocationItemView(location: "Наньчон", isSelected: false, temperature: 7, temperatureRange: [4, 7], weatherIcon:
-            UIImage(named: "ic_cloud_black_with_sun")!),
-        LocationItemView(location: "Наньчон", isSelected: false, temperature: 7, temperatureRange: [4, 7], weatherIcon:
-            UIImage(named: "ic_cloud_black_with_sun")!),
-        LocationItemView(location: "Наньчон", isSelected: false, temperature: 7, temperatureRange: [4, 7], weatherIcon:
-            UIImage(named: "ic_cloud_black_with_sun")!)
-        ]
+    private let locationsDataManager = WeatherCoreDataService.shared
+    private let locationRepository = LocationRepository.shared
     
+    private let buttonAdd = ButtonAdd()
+        
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -26,43 +21,95 @@ class LocationsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupView()
+    }
+}
+
+private extension LocationsViewController {
+    
+    func setupView() {
+        
         view.backgroundColor = .baseBackground
-        self.setUpUI()
+        
+        addSubViews()
+        setupConstraints()
+    }
+}
+
+private extension LocationsViewController {
+    
+    func addSubViews() {
+        self.collectionView.allowsMultipleSelection = false
         
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
+        
+        locationsDataManager.getAllLocations()
+        
+        buttonAdd.onClick = {
+            let textFieldWindow = TextFieldWindow.initDialog() { text in
+                self.getLocation(city: text)
+            }
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissAlertController))
+            textFieldWindow.view.superview?.subviews[0].addGestureRecognizer(tapGesture)
+           
+            
+            self.present(textFieldWindow, animated: true, completion: nil)
+        
+        }
+        
+        view.addSubview(collectionView)
+        view.addSubview(buttonAdd)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        buttonAdd.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    private func setUpUI() {
-        view.addSubview(collectionView)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        
+    @objc func dismissAlertController(city: String) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func getLocation(city: String) {
+        if (!city.isEmpty) {
+            Task {
+                let response = try await locationRepository.getLocationData(city: city)
+                DispatchQueue.main.async {
+                    self.locationsDataManager.addLocation(locationData: response)
+                    self.collectionView.reloadData()
+                }
+            }
+        }
+    }
+}
+
+private extension LocationsViewController {
+    
+    func setupConstraints() {
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+            collectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
+            
+            buttonAdd.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            buttonAdd.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -100)
         ])
     }
 }
 
-extension LocationsViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension LocationsViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.items.count
+        return locationsDataManager.locations.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LocationCollectionViewCell.identifier, for: indexPath) as? LocationCollectionViewCell else { fatalError("Error :)") }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LocationCollectionViewCell.identifier, for: indexPath) as? LocationCollectionViewCell else { fatalError("Error LocationCollectionViewCell") }
         
-        let item = self.items[indexPath.row]
-        cell.configure(with: item)
+        let item = locationsDataManager.locations[indexPath.row]
+        cell.configure(with: item.convertToLocationItemView())
         
         return cell
     }
-}
-
-extension LocationsViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 164, height: 154)

@@ -1,7 +1,7 @@
 import UIKit
 import SwiftUI
 
-class LocationCardViewCell: UIView {
+final class LocationCardViewCell: UIView {
     
     static let identifier: String = "LocationCardViewCell"
     
@@ -31,7 +31,12 @@ class LocationCardViewCell: UIView {
         }
         weatherIcon.image = location.weatherIcon
         
-        if (location.isSelected) {
+        changeSelectedUI(isItemSelected: location.isSelected)
+    }
+    
+    func changeSelectedUI(isItemSelected: Bool) {
+        print("Item selected: \(isItemSelected)")
+        if (isItemSelected) {
             checkIcon.isHidden = false
             gpsIcon.isHidden = false
             textPosition.isHidden = false
@@ -176,7 +181,7 @@ class LocationCardViewCell: UIView {
 struct LocationCardViewPreview: UIViewRepresentable {
     func makeUIView(context: Context) -> LocationCardViewCell {
         let view = LocationCardViewCell()
-        let sampleItem = LocationItemView(location: "Наньчон", isSelected: true, temperature: 7, temperatureRange: [4, 7],
+        let sampleItem = LocationItemView(location: "Наньчон", isSelected: true, temperature: "7", temperatureRange: "4 - 7",
             weatherIcon: UIImage(named: "ic_cloud_black_rain")!)
         view.configure(with: sampleItem)
         return view

@@ -43,6 +43,12 @@ class LocationCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
         cardView.clearViewForReuse()
     }
+    
+    override var isSelected: Bool {
+        didSet {
+            cardView.changeSelectedUI(isItemSelected: self.isSelected)
+        }
+    }
 }
 
 func centerItemsInCollectionView(cellWidth: Double, numberOfItems: Double, spaceBetweenCell: Double, collectionView: UICollectionView) -> UIEdgeInsets {

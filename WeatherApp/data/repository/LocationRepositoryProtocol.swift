@@ -1,5 +1,5 @@
 
-protocol LocationRepositoryProtocol {
+protocol LocationRepositoryProtocol: GetCoordByGeoDelegate {
     
-    func getLocationData(city: String) async throws -> GeocodingData
+    func getLocationData(city: String) async throws -> LocationData
 }
